@@ -27,7 +27,7 @@ const login = async (req, res) => {
             }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '1d' }
+        { expiresIn: '10s' }
     )
 
     const refreshToken = jwt.sign(
@@ -36,6 +36,8 @@ const login = async (req, res) => {
         { expiresIn: '7d' }
     )
 
+    const roles = foundUser.roles;
+
     res.cookie('jwt', refreshToken, {
         httpOnly: true, // accessible only by the web browser
         secure: true,
@@ -43,7 +45,7 @@ const login = async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000 // cookie expiry: set to match refreshToken
     })
 
-    res.json({ accessToken })
+    res.json({ accessToken, roles })
 
 
 }
@@ -99,7 +101,7 @@ const refresh = async (req, res) => {
                 },
 
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '1d' }
+                { expiresIn: '10s' }
             )
 
             res.json({ accessToken })
