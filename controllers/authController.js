@@ -27,13 +27,13 @@ const login = async (req, res) => {
             }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '10s' }
+        { expiresIn: '1m' }
     )
 
     const refreshToken = jwt.sign(
         { "username": foundUser.username },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: '7d' }
+        { expiresIn: '1d' }
     )
 
     const roles = foundUser.roles;
@@ -60,7 +60,7 @@ const signup = async (req, res) => {
     const foundUser = await User.findOne({ username }).exec()
 
     if (foundUser) {
-        return res.status(401).json({ message: "Duplicate Username!" })
+        return res.status(409).json({ message: "Duplicate Username!" })
     }
 
     const passwordHash = await bcrypt.hash(password, 10)
@@ -101,10 +101,12 @@ const refresh = async (req, res) => {
                 },
 
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '10s' }
+                { expiresIn: '1m' }
             )
 
-            res.json({ accessToken })
+            const roles = foundUser.roles;
+
+            res.json({ accessToken, roles })
         }
     )
 }
