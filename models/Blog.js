@@ -2,19 +2,19 @@ const mongoose = require('mongoose')
 
 const blogSchema = new mongoose.Schema(
     {
-        user: {
-            type: String,
-            required: true
-        },
         title: {
             type: String,
-            required: true
         },
-        text: {
+        cover: {
             type: String,
-            required: true
         },
-
+        content: {
+            type: Object,
+        },
+        published: {
+            type: Boolean,
+            required: true,
+        }
     },
     {
         timestamps: true

@@ -9,45 +9,24 @@ const asyncHandler = require('express-async-handler')
 const getAllBlogs = asyncHandler(async (req, res) => {
     const blogs = await Blog.find().lean()
     if (!blogs?.length) {
-        return res.status(400).json({ message: 'No article found' })
+        return res.status(200).json({ message: 'No article found' })
     }
-
     // Add username to each blog before sending the response
-    const blogsWithUser = await Promise.all(blogs.map(async (blog) => {
-        const user = await User.findById(blog.user).lean().exec()
-        return { ...blog, username: user.username }
-    }))
-
-    res.json(blogsWithUser)
+    res.json(blogs);
 })
 
 //@desc Create a new blog
 // @route POST /blogs
 // @success Private
 const createNewBlog = asyncHandler(async (req, res) => {
-    const { user, title, text } = req.body
-
-    if (!user || !title || !text) {
-        return res.status(400).json({ message: 'All fields are required' })
-    }
-
-    const the_user = User.findById(user).exec()
-
-    if (the_user) {
-        console.log("user found")
-        
-        const blog = await Blog.create({ user, title, text })
-
-        if (blog) {
-            return res.status(201).json({ message: 'New blog created' })
-        } else {
-            return res.status(400).json({ message: 'Invalid blog data received' })
-        }
+    const blog = await Blog.create({ published: false })
+    console.log(blog._id)
+    const blog_id = blog._id;
+    if (blog) {
+        return res.status(201).json({ message: 'New blog created', blog_id})
     } else {
-        return res.status(400).json({ message: "Invalid user" })
+        return res.status(400).json({ message: 'Invalid blog data received' })
     }
-
-    
     
 })
 
@@ -55,9 +34,9 @@ const createNewBlog = asyncHandler(async (req, res) => {
 // @route PATCH /blogs
 // @success Private
 const updateBlog = asyncHandler(async (req, res) => {
-    const { id, user, title, text } = req.body
+    const { id, title, cover, content} = req.body
 
-    if (!id || !user || !title || !text) {
+    if (!id || !title || !content) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
@@ -67,9 +46,11 @@ const updateBlog = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: 'Blog not found' })
     }
 
-    blog.user = user
+    blog.content = content
     blog.title = title
-    blog.text = text
+    if (cover) {
+        blog.cover = cover
+    }
 
     const updatedBlog = await blog.save()
 
