@@ -13,5 +13,6 @@ router.route('/')
 
 router.route('/:blog_id')
     .get(blogsController.getSingleBlog)
+    .delete(blogsController.deleteSingleBlog)
 
 module.exports = router

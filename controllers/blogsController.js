@@ -26,6 +26,15 @@ const getSingleBlog = asyncHandler(async (req, res) => {
     return res.json(blog)
 })
 
+const deleteSingleBlog = asyncHandler(async (req, res) => {
+    const id = req.params.blog_id
+    const blog = await Blog.findById(id).exec();
+    const result = await blog.deleteOne();
+    const reply = `${result._id} deleted`
+
+    res.json(reply)
+})
+
 //@desc Create a new blog
 // @route POST /blogs
 // @success Private
@@ -108,10 +117,11 @@ const deleteBlog = asyncHandler(async (req, res) => {
 
     const result = await blog.deleteOne()
 
-    const reply = `Blog ${result.title} with ID ${result._id} deleted`
+    const reply = `${result._id} deleted`
 
     res.json(reply)
 })
+
 
 
 module.exports = {
@@ -119,7 +129,8 @@ module.exports = {
     createNewBlog,
     updateBlog,
     deleteBlog,
-    getSingleBlog
+    getSingleBlog,
+    deleteSingleBlog
 }
 
 
