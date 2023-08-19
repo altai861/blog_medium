@@ -14,6 +14,9 @@ const blogSchema = new mongoose.Schema(
         published: {
             type: Boolean,
             required: true,
+        },
+        type: {
+            type: Number,
         }
     },
     {

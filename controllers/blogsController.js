@@ -15,11 +15,34 @@ const getAllBlogs = asyncHandler(async (req, res) => {
     res.json(blogs);
 })
 
+
+const getSingleBlog = asyncHandler(async (req, res) => {
+    const id = req.params.blog_id
+    const blog = await Blog.findById(id).exec();
+    if (!blog) {
+        return res.status(400).json({ message: "Blog not found" })
+    }
+
+    return res.json(blog)
+})
+
 //@desc Create a new blog
 // @route POST /blogs
 // @success Private
 const createNewBlog = asyncHandler(async (req, res) => {
-    const blog = await Blog.create({ published: false })
+    const content = {
+        "time": new Date().getTime(),
+        "blocks": [
+          {
+            "type": "header",
+            "data": {
+              "text": "This is my awesome editor!",
+              "level": 1
+            }
+          },
+        ]
+      }
+    const blog = await Blog.create({ content: content, published: false })
     console.log(blog._id)
     const blog_id = blog._id;
     if (blog) {
@@ -34,9 +57,9 @@ const createNewBlog = asyncHandler(async (req, res) => {
 // @route PATCH /blogs
 // @success Private
 const updateBlog = asyncHandler(async (req, res) => {
-    const { id, title, cover, content} = req.body
+    const { id, content, published, title, cover} = req.body
 
-    if (!id || !title || !content) {
+    if (!id || !content) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
@@ -47,14 +70,23 @@ const updateBlog = asyncHandler(async (req, res) => {
     }
 
     blog.content = content
-    blog.title = title
-    if (cover) {
+    if (published) {
+        if (!title || !cover) {
+            return res.status(401).json({ message: 'To publish blog post, you have to have title and cover page' });
+        }
+        blog.published = published
+        blog.title = title
         blog.cover = cover
+    } else {
+        blog.published = published
+        blog.cover = cover
+        blog.title = title
     }
-
+    blog.title = title
+    blog.cover = cover
     const updatedBlog = await blog.save()
 
-    res.json(`${updatedBlog.title} updated`)
+    res.json(`${updatedBlog._id} updated`)
 })
 
 
@@ -81,12 +113,16 @@ const deleteBlog = asyncHandler(async (req, res) => {
     res.json(reply)
 })
 
+
 module.exports = {
     getAllBlogs,
     createNewBlog,
     updateBlog,
-    deleteBlog
+    deleteBlog,
+    getSingleBlog
 }
+
+
 
 
 

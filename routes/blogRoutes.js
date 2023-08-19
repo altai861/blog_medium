@@ -11,4 +11,7 @@ router.route('/')
     .patch(blogsController.updateBlog)
     .delete(blogsController.deleteBlog)
 
+router.route('/:blog_id')
+    .get(blogsController.getSingleBlog)
+
 module.exports = router
