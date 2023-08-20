@@ -16,7 +16,7 @@ const blogSchema = new mongoose.Schema(
             required: true,
         },
         type: {
-            type: Number,
+            type: String,
         }
     },
     {

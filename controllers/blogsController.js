@@ -66,7 +66,7 @@ const createNewBlog = asyncHandler(async (req, res) => {
 // @route PATCH /blogs
 // @success Private
 const updateBlog = asyncHandler(async (req, res) => {
-    const { id, content, published, title, cover} = req.body
+    const { id, content, published, title, cover, type} = req.body
 
     if (!id || !content) {
         return res.status(400).json({ message: 'All fields are required' })
@@ -80,19 +80,22 @@ const updateBlog = asyncHandler(async (req, res) => {
 
     blog.content = content
     if (published) {
-        if (!title || !cover) {
+        if (!title || !cover || !type) {
             return res.status(401).json({ message: 'To publish blog post, you have to have title and cover page' });
         }
         blog.published = published
         blog.title = title
         blog.cover = cover
+        blog.type = type
     } else {
         blog.published = published
         blog.cover = cover
         blog.title = title
+        blog.type = type
     }
     blog.title = title
     blog.cover = cover
+    blog.type = type
     const updatedBlog = await blog.save()
 
     res.json(`${updatedBlog._id} updated`)
